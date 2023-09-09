@@ -1,7 +1,7 @@
 import sys
 import os
 import re
-from datetime import datetime
+from datetime import datetime, date
 from dataclasses import dataclass, asdict
 from typing import Literal
 
@@ -11,8 +11,21 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 
-def log_console(data: object):
-    print(data, file=sys.stderr)
+def log_console(*data: object):
+    print(*data, file=sys.stderr)
+
+
+@dataclass(kw_only=True)
+class TimeSlot:
+    date: date
+    time: int
+
+    @classmethod
+    def from_iso(cls, iso_str):
+        d = datetime.fromisoformat(iso_str)
+        if d.hour < 9 or d.hour > 23:
+            assert False
+        return cls(date=d.date(), time=d.hour)
 
 
 @dataclass(kw_only=True)
@@ -23,7 +36,7 @@ class Callback:
 
 @dataclass(kw_only=True)
 class BookingRequests:
-    giorni: list[datetime]
+    giorni: list[TimeSlot]
     callback: Callback
 
     @staticmethod
@@ -39,7 +52,7 @@ class BookingRequests:
     @classmethod
     def from_dict(cls, json_data):
         return cls(
-            giorni=[datetime.fromisoformat(d) for d in json_data["giorni"]],
+            giorni=[TimeSlot.from_iso(d) for d in json_data["giorni"]],
             callback=cls.check_email_or_url(json_data["callback"]),
         )
 
@@ -53,4 +66,4 @@ def hello_world():
 def post_booking():
     data = BookingRequests.from_dict(request.json)
     log_console(data)
-    return jsonify({"message": "OK", "data": asdict(data)})
+    return jsonify(asdict(data))

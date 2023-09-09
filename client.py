@@ -4,7 +4,7 @@ import requests
 response = requests.post(
     "http://0.0.0.0:5000/disponibilita",
     json={
-        "giorni": ["2023-10-01T11:00:00", "2023-10-02T12:00:00"],
+        "giorni": ["2023-10-01 11", "2023-10-02 09", "2024-11-11 12"],
         "callback": "bacchilu@gmail.com",
     },
 )
