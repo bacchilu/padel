@@ -7,6 +7,7 @@ services:
         - "UID=${UID}"
         - "GID=${GID}"
         - "MODE=PROD"
+        - "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
         - "FLASK_DEBUG=0"
     ports:
       - '80:8000'
@@ -20,6 +21,7 @@ services:
         - "UID=${UID}"
         - "GID=${GID}"
         - "MODE=DEV"
+        - "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
         - "FLASK_DEBUG=1"
     ports:
       - '5000:8000'

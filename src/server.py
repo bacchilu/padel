@@ -7,6 +7,8 @@ from typing import Literal
 
 from flask import Flask, request, jsonify
 
+from auth import check_auth
+
 
 app = Flask(__name__)
 
@@ -23,9 +25,9 @@ class TimeSlot:
     @classmethod
     def from_iso(cls, iso_str):
         d = datetime.fromisoformat(iso_str)
-        if d.hour < 9 or d.hour > 23:
-            assert False
-        return cls(date=d.date(), time=d.hour)
+        if 9 <= d.hour <= 23:
+            return cls(date=d.date(), time=d.hour)
+        raise Exception("Wrong data format")
 
 
 @dataclass(kw_only=True)
@@ -47,7 +49,7 @@ class BookingRequests:
             return Callback(type="EMAIL", value=input_string)
         elif re.match(url_pattern, input_string):
             return Callback(type="URL", value=input_string)
-        assert False
+        raise Exception("Wrong data format")
 
     @classmethod
     def from_dict(cls, json_data):
@@ -64,6 +66,15 @@ def hello_world():
 
 @app.route("/disponibilita", methods=["POST"])
 def post_booking():
-    data = BookingRequests.from_dict(request.json)
-    log_console(data)
-    return jsonify(asdict(data))
+    try:
+        payload = check_auth(request)
+    except Exception as e:
+        return jsonify({"message": str(e)}), 401
+
+    try:
+        data = BookingRequests.from_dict(request.json)
+        log_console(payload)
+        log_console(data)
+        return jsonify(asdict(data))
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
