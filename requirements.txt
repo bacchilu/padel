@@ -1,3 +1,5 @@
 flask
 requests
 pyJWT
+SQLAlchemy
+mysql-connector-python
