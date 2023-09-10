@@ -1,4 +1,12 @@
 services:
+  mysql-db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: luca
+      MYSQL_DATABASE: padel
+    ports:
+      - '3306:3306'
+    restart: unless-stopped
   padel-web-prod:
     build:
       context: ./
@@ -33,11 +41,3 @@ services:
     env_file: .env
     depends_on:
       - "mysql-db"
-  mysql-db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: luca
-      MY_DATABASE: padel
-    ports:
-      - '3306:3306'
-    restart: unless-stopped

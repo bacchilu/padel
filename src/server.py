@@ -1,4 +1,3 @@
-import sys
 import os
 import re
 from datetime import datetime, date
@@ -8,13 +7,10 @@ from typing import Literal
 from flask import Flask, request, jsonify
 
 from auth import check_auth
+from utils import log_console
 
 
 app = Flask(__name__)
-
-
-def log_console(*data: object):
-    print(*data, file=sys.stderr)
 
 
 @dataclass(kw_only=True)
@@ -67,13 +63,13 @@ def hello_world():
 @app.route("/disponibilita", methods=["POST"])
 def post_booking():
     try:
-        payload = check_auth(request)
+        user = check_auth(request)
     except Exception as e:
         return jsonify({"message": str(e)}), 401
 
     try:
         data = BookingRequests.from_dict(request.json)
-        log_console(payload)
+        log_console(user)
         log_console(data)
         return jsonify(asdict(data))
     except Exception as e:
