@@ -12,7 +12,15 @@ app.config[
     "SQLALCHEMY_DATABASE_URI"
 ] = "mysql+mysqlconnector://root:luca@mysql-db/padel"
 db = SQLAlchemy()
-db.init_app(app)
+
+
+def init_db(app: Flask):
+    db.init_app(app)
+    # with app.app_context():
+    #     db.create_all()
+
+
+init_db(app)
 
 
 class User(db.Model):
@@ -31,7 +39,7 @@ class UserData:
 
 class DBModel:
     @staticmethod
-    def get_users(id: int):
+    def get_user(id: int):
         with app.app_context():
             user = User.query.get(id)
             return None if user is None else UserData(id=user.id, user=user.name)
@@ -59,7 +67,7 @@ def check_jwt(request: Request):
 
 def check_auth(request: Request):
     payload = check_jwt(request)
-    res = DBModel.get_users(payload.id)
+    res = DBModel.get_user(payload.id)
     if res is None:
         raise Exception("User not found")
     return res
