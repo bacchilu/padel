@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone, timedelta
+from pprint import pprint
 
 import requests
 
@@ -34,6 +35,7 @@ response = requests.post(
 )
 
 if response.status_code == 200:
-    print("Success:", response.json())
+    print("Success")
+    pprint(response.json())
 else:
     print("Failure:", response.status_code, response.text)

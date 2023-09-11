@@ -7,19 +7,14 @@ services:
     ports:
       - '3306:3306'
     restart: unless-stopped
-  padel-web-prod:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-      args:
-        - "UID=${UID}"
-        - "GID=${GID}"
-        - "MODE=PROD"
-        - "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
-        - "FLASK_DEBUG=0"
+  rabbitmq:
+    image: "rabbitmq"
     ports:
-      - '80:8000'
-    env_file: .env
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: luca
+      RABBITMQ_DEFAULT_PASS: luca
     restart: unless-stopped
     depends_on:
       - "mysql-db"
@@ -41,3 +36,21 @@ services:
     env_file: .env
     depends_on:
       - "mysql-db"
+      - "rabbitmq"
+  padel-web-prod:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - "UID=${UID}"
+        - "GID=${GID}"
+        - "MODE=PROD"
+        - "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
+        - "FLASK_DEBUG=0"
+    ports:
+      - '80:8000'
+    env_file: .env
+    restart: unless-stopped
+    depends_on:
+      - "mysql-db"
+      - "rabbitmq"

@@ -1,58 +1,60 @@
 import os
-import re
-from datetime import datetime, date
-from dataclasses import dataclass, asdict
-from typing import Literal
+import json
+from contextlib import contextmanager
+
 
 from flask import Flask, request, jsonify
+import pika
+from pika.adapters.blocking_connection import BlockingChannel
+
 
 from auth import check_auth
 from utils import log_console
+from data_types import BookingRequests
 
 
 app = Flask(__name__)
 
 
-@dataclass(kw_only=True)
-class TimeSlot:
-    date: date
-    time: int
+class Channel:
+    QUEUE_NAME = "padel_queue"
+    rabbitmq_parameters = pika.ConnectionParameters(
+        host="rabbitmq",
+        port=5672,
+        credentials=pika.PlainCredentials(username="luca", password="luca"),
+    )
 
-    @classmethod
-    def from_iso(cls, iso_str):
-        d = datetime.fromisoformat(iso_str)
-        if 9 <= d.hour <= 23:
-            return cls(date=d.date(), time=d.hour)
-        raise Exception("Wrong data format")
+    def __init__(self, channel: BlockingChannel):
+        self.channel = channel
 
-
-@dataclass(kw_only=True)
-class Callback:
-    type: Literal["EMAIL", "URL"]
-    value: str
-
-
-@dataclass(kw_only=True)
-class BookingRequests:
-    giorni: list[TimeSlot]
-    callback: Callback
-
-    @staticmethod
-    def check_email_or_url(input_string: str):
-        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-        url_pattern = r"^(https?://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$"
-        if re.match(email_pattern, input_string):
-            return Callback(type="EMAIL", value=input_string)
-        elif re.match(url_pattern, input_string):
-            return Callback(type="URL", value=input_string)
-        raise Exception("Wrong data format")
-
-    @classmethod
-    def from_dict(cls, json_data):
-        return cls(
-            giorni=[TimeSlot.from_iso(d) for d in json_data["giorni"]],
-            callback=cls.check_email_or_url(json_data["callback"]),
+    def basic_publish(self, data: dict):
+        self.channel.basic_publish(
+            exchange="",
+            routing_key=Channel.QUEUE_NAME,
+            body=json.dumps(data),
+            properties=pika.BasicProperties(delivery_mode=2),
         )
+
+    @classmethod
+    @contextmanager
+    def get_channel(cls):
+        with pika.BlockingConnection(Channel.rabbitmq_parameters) as connection:
+            channel = connection.channel()
+            channel.queue_declare(queue=Channel.QUEUE_NAME)
+            yield cls(channel)
+
+
+class Queue:
+    @staticmethod
+    def push(data: list[BookingRequests]):
+        with Channel.get_channel() as channel:
+            for item in data:
+                e = item.to_dict()
+                try:
+                    channel.basic_publish(e)
+                    log_console("Data published to RabbitMQ successfully.")
+                except Exception as e:
+                    log_console(str(e))
 
 
 @app.route("/")
@@ -68,9 +70,8 @@ def post_booking():
         return jsonify({"message": str(e)}), 401
 
     try:
-        data = BookingRequests.from_dict(request.json)
-        log_console(user)
-        log_console(data)
-        return jsonify(asdict(data))
+        data = BookingRequests.from_dict(user.id, request.get_json())
+        Queue.push(data)
+        return jsonify(request.get_json())
     except Exception as e:
         return jsonify({"message": str(e)}), 500

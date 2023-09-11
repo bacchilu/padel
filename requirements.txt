@@ -4,3 +4,4 @@ pyJWT
 SQLAlchemy
 mysql-connector-python
 flask_sqlalchemy
+pika
