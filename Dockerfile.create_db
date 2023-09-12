@@ -19,6 +19,6 @@ ENV PYTHONPATH="."
 ENV PATH="${PATH}:/home/python/.local/bin"
 ENV USER="python"
 
-COPY --chown=python:python ./src/create_db.py .
+COPY --chown=python:python ./src .
 
 CMD ["python3", "create_db.py"]
