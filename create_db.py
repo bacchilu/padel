@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
@@ -43,7 +45,16 @@ Slot.bookings = relationship("Booking", order_by=Booking.date, back_populates="s
 User.bookings = relationship("Booking", order_by=Booking.date, back_populates="user")
 
 
-Base.metadata.create_all(bind=engine, checkfirst=True)
+def create_all(timeout=1):
+    try:
+        Base.metadata.create_all(bind=engine, checkfirst=True)
+    except:
+        print("Try again...")
+        time.sleep(timeout + 1)
+        create_all()
+
+
+create_all()
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

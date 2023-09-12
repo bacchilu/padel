@@ -2,47 +2,10 @@ import os
 from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass, field
 
-from flask import Flask, Request
+from flask import Request
 import jwt
-from flask_sqlalchemy import SQLAlchemy
 
-
-app = Flask(__name__)
-app.config[
-    "SQLALCHEMY_DATABASE_URI"
-] = "mysql+mysqlconnector://root:luca@mysql-db/padel"
-db = SQLAlchemy()
-
-
-def init_db(app: Flask):
-    db.init_app(app)
-    # with app.app_context():
-    #     db.create_all()
-
-
-init_db(app)
-
-
-class User(db.Model):
-    __tablename__ = "user"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), unique=True)
-    email = db.Column(db.String(255), unique=True)
-
-
-@dataclass
-class UserData:
-    id: int
-    user: str
-
-
-class DBModel:
-    @staticmethod
-    def get_user(id: int):
-        with app.app_context():
-            user = User.query.get(id)
-            return None if user is None else UserData(id=user.id, user=user.name)
+from .database import DBModel
 
 
 @dataclass
@@ -67,7 +30,7 @@ def check_jwt(request: Request):
 
 def check_auth(request: Request):
     payload = check_jwt(request)
-    res = DBModel.get_user(payload.id)
+    res = DBModel.get_user_by(payload.id)
     if res is None:
         raise Exception("User not found")
     return res

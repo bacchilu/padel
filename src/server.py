@@ -5,9 +5,15 @@ from flask import Flask, request, jsonify
 from libs.auth import check_auth
 from libs.data_types import BookingRequests
 from libs.async_queue import Queue
+from libs.database import db
 
 
 app = Flask(__name__)
+app.config[
+    "SQLALCHEMY_DATABASE_URI"
+] = "mysql+mysqlconnector://root:luca@mysql-db/padel"
+
+db.init_app(app)
 
 
 @app.route("/")
