@@ -18,10 +18,21 @@ services:
     restart: unless-stopped
     depends_on:
       - "mysql-db"
+  consumer-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile.consumer
+      args:
+        - "UID=${UID}"
+        - "GID=${GID}"
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./src:/app
   padel-web-dev:
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.server
       args:
         - "UID=${UID}"
         - "GID=${GID}"
@@ -37,10 +48,11 @@ services:
     depends_on:
       - "mysql-db"
       - "rabbitmq"
+      # - "consumer-app"
   padel-web-prod:
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.server
       args:
         - "UID=${UID}"
         - "GID=${GID}"
