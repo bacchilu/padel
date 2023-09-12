@@ -36,8 +36,6 @@ services:
         - "GID=${GID}"
     depends_on:
       - rabbitmq
-    volumes:
-      - ./src:/app
   padel-web-dev:
     build:
       context: ./
@@ -57,7 +55,7 @@ services:
     depends_on:
       - "create_db"
       - "rabbitmq"
-      # - "consumer-app"
+      - "consumer-app"
   padel-web-prod:
     build:
       context: ./

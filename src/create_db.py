@@ -35,7 +35,7 @@ class Booking(Base):
     time = Column(Integer, primary_key=True, index=True)
     slot_id = Column(Integer, ForeignKey("slot.id"), primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("user.id"), primary_key=True, index=True)
-    callback = Column(String(255), unique=True, index=True)
+    callback = Column(String(255))
 
     slot = relationship("Slot", back_populates="bookings")
     user = relationship("User", back_populates="bookings")
