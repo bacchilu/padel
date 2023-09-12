@@ -7,6 +7,15 @@ services:
     ports:
       - '3306:3306'
     restart: unless-stopped
+  create_db:
+    build:
+      context: ./
+      dockerfile: Dockerfile.create_db
+      args:
+        - "UID=${UID}"
+        - "GID=${GID}"
+    depends_on:
+      - mysql-db
   rabbitmq:
     image: "rabbitmq"
     ports:
@@ -17,7 +26,7 @@ services:
       RABBITMQ_DEFAULT_PASS: luca
     restart: unless-stopped
     depends_on:
-      - "mysql-db"
+      - "create_db"
   consumer-app:
     build:
       context: ./
@@ -46,7 +55,7 @@ services:
     command: [ "flask", "run", "--host=0.0.0.0", "--port=8000" ]
     env_file: .env
     depends_on:
-      - "mysql-db"
+      - "create_db"
       - "rabbitmq"
       # - "consumer-app"
   padel-web-prod:
@@ -64,5 +73,5 @@ services:
     env_file: .env
     restart: unless-stopped
     depends_on:
-      - "mysql-db"
+      - "create_db"
       - "rabbitmq"

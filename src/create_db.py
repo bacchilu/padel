@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 
 
-database_uri = "mysql+mysqlconnector://root:luca@0.0.0.0/padel"
+database_uri = "mysql+mysqlconnector://root:luca@mysql-db/padel"
 
 
 engine = create_engine(database_uri)
@@ -54,26 +54,24 @@ def create_all(timeout=1):
         create_all()
 
 
-create_all()
+if __name__ == "__main__":
+    create_all()
 
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    session = SessionLocal()
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    try:
+        session.add(User(id=1, name="Luca", email="bacchilu@gmail.com"))
+        session.add(User(id=2, name="Viola", email="viola@example.com"))
 
+        session.add(Slot(id=1, name="Slot 1"))
+        session.add(Slot(id=2, name="Slot 2"))
+        session.add(Slot(id=3, name="Slot 3"))
+        session.add(Slot(id=4, name="Slot 4"))
 
-session = SessionLocal()
-
-try:
-    session.add(User(id=1, name="Luca", email="bacchilu@gmail.com"))
-    session.add(User(id=2, name="Viola", email="viola@example.com"))
-
-    session.add(Slot(id=1, name="Slot 1"))
-    session.add(Slot(id=2, name="Slot 2"))
-    session.add(Slot(id=3, name="Slot 3"))
-    session.add(Slot(id=4, name="Slot 4"))
-
-    session.commit()
-except Exception as e:
-    print(f"Error: {e}")
-    session.rollback()
-finally:
-    session.close()
+        session.commit()
+    except Exception as e:
+        print(f"Error: {e}")
+        session.rollback()
+    finally:
+        session.close()
