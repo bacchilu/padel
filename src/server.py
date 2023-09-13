@@ -9,12 +9,18 @@ from libs.db_model import DBModel
 
 
 app = Flask(__name__)
+app.static_folder = "static/dist"
 
 
 @app.route("/")
 def hello_world():
     return send_from_directory("static/dist", "index.html")
     # return f"Hello, Flask! - 1.0.0 ({os.environ.get('MODE')})"
+
+
+@app.route("/<path:filename>")
+def serve_js(filename):
+    return send_from_directory("static/dist", filename)
 
 
 @app.route("/disponibilita", methods=["POST"])
