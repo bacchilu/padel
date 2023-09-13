@@ -1,7 +1,5 @@
 from contextlib import contextmanager
 
-from dataclasses import dataclass
-
 from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
@@ -54,21 +52,3 @@ def getSession():
     except:
         session.rollback()
         raise
-
-
-@dataclass
-class UserData:
-    id: int
-    user: str
-
-
-class DBModel:
-    @staticmethod
-    def get_user_by(id: int):
-        with getSession() as session:
-            user = session.query(User).filter_by(id=id).first()
-            return (
-                None
-                if user is None
-                else UserData(id=int(str(user.id)), user=str(user.name))
-            )

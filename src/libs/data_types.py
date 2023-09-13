@@ -55,3 +55,24 @@ class BookingRequests:
 
     def to_dict(self):
         return {**asdict(self), "date_time": self.date_time.to_dict()}
+
+
+@dataclass
+class UserData:
+    id: int
+    user: str
+
+
+@dataclass
+class SlotData:
+    id: int
+    name: str
+
+
+@dataclass
+class BookingData:
+    date: date
+    time: int
+    slot_id: int
+    user_id: int
+    callback: str

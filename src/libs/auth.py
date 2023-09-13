@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from flask import Request
 import jwt
 
-from .database import DBModel
+from .db_model import DBModel
 
 
 @dataclass

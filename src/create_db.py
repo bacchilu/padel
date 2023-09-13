@@ -1,16 +1,10 @@
-import time
-
-
 from libs import database
+from libs.utils import reconnection_decorator
 
 
-def create_all(timeout=1):
-    try:
-        database.Base.metadata.create_all(bind=database.engine, checkfirst=True)
-    except:
-        print("Try again...")
-        time.sleep(timeout + 1)
-        create_all()
+@reconnection_decorator(max_retries=10, delay_seconds=5)
+def create_all():
+    database.Base.metadata.create_all(bind=database.engine, checkfirst=True)
 
 
 if __name__ == "__main__":
