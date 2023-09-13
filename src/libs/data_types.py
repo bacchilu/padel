@@ -68,14 +68,23 @@ class UserData:
     id: int
     user: str
 
+    def to_dict(self):
+        return asdict(self)
+
 
 @dataclass
 class SlotData:
     id: int
     name: str
 
+    def to_dict(self):
+        return asdict(self)
+
 
 @dataclass
 class BookingData:
     slot_id: int
     data: BookingRequests
+
+    def to_dict(self):
+        return {**asdict(self), "data": self.data.to_dict()}

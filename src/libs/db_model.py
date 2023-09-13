@@ -24,6 +24,24 @@ class DBModel:
             ]
 
     @staticmethod
+    def get_all_bookings():
+        with getSession() as session:
+            return [
+                BookingData(
+                    slot_id=int(str(r.slot_id)),
+                    data=BookingRequests(
+                        user_id=int(str(r.user_id)),
+                        time_slot=TimeSlot(
+                            date=datetime.date.fromisoformat(str(r.date)),
+                            time=int(str(r.time)),
+                        ),
+                        callback=BookingRequests.check_email_or_url(str(r.callback)),
+                    ),
+                )
+                for r in session.query(Booking).all()
+            ]
+
+    @staticmethod
     def find_bookings(
         target_slot_id: int, target_user_id: int | None, target_time_slot: TimeSlot
     ):
