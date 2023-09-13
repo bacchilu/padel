@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, date
+from datetime import datetime, date, time
 from dataclasses import dataclass, asdict
 from typing import Literal
 
@@ -18,6 +18,9 @@ class TimeSlot:
 
     def to_dict(self):
         return {**asdict(self), "date": self.date.isoformat()}
+
+    def is_expired(self):
+        return datetime.combine(self.date, time(self.time)) < datetime.now()
 
 
 @dataclass(kw_only=True)
