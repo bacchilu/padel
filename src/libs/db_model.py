@@ -1,6 +1,6 @@
 import datetime
 
-from .data_types import UserData, SlotData, BookingData
+from .data_types import UserData, SlotData, BookingData, TimeSlot, BookingRequests
 from .database import getSession, User, Slot, Booking
 
 
@@ -25,16 +25,13 @@ class DBModel:
 
     @staticmethod
     def find_bookings(
-        target_date: datetime.date,
-        target_time: int,
-        target_slot_id: int,
-        target_user_id: int | None,
+        target_slot_id: int, target_user_id: int | None, target_time_slot: TimeSlot
     ):
         with getSession() as session:
             res = (
                 session.query(Booking)
-                .filter(Booking.date == target_date)
-                .filter(Booking.time == target_time)
+                .filter(Booking.date == target_time_slot.date)
+                .filter(Booking.time == target_time_slot.time)
                 .filter(Booking.slot_id == target_slot_id)
                 .filter(
                     Booking.user_id == Booking.user_id
@@ -45,28 +42,28 @@ class DBModel:
             )
             return [
                 BookingData(
-                    date=datetime.date.fromisoformat(str(r.date)),
-                    time=int(str(r.time)),
                     slot_id=int(str(r.slot_id)),
-                    user_id=int(str(r.user_id)),
-                    callback=str(r.callback),
+                    data=BookingRequests(
+                        user_id=int(str(r.user_id)),
+                        time_slot=TimeSlot(
+                            date=datetime.date.fromisoformat(str(r.date)),
+                            time=int(str(r.time)),
+                        ),
+                        callback=BookingRequests.check_email_or_url(str(r.callback)),
+                    ),
                 )
                 for r in res
             ]
 
     @staticmethod
     def add_booking(
-        target_date: datetime.date,
-        target_time: int,
-        target_user_id: int,
-        slot_id: int,
-        callback: str,
+        slot_id: int, target_user_id: int, target_time_slot: TimeSlot, callback: str
     ):
         with getSession() as session:
             session.add(
                 Booking(
-                    date=target_date,
-                    time=target_time,
+                    date=target_time_slot.date,
+                    time=target_time_slot.time,
                     user_id=target_user_id,
                     slot_id=slot_id,
                     callback=callback,

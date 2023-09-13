@@ -29,7 +29,7 @@ class Callback:
 @dataclass(kw_only=True)
 class BookingRequests:
     user_id: int
-    date_time: TimeSlot
+    time_slot: TimeSlot
     callback: Callback
 
     @staticmethod
@@ -47,14 +47,14 @@ class BookingRequests:
         return [
             cls(
                 user_id=user_id,
-                date_time=TimeSlot.from_iso(d),
+                time_slot=TimeSlot.from_iso(d),
                 callback=cls.check_email_or_url(json_data["callback"]),
             )
             for d in json_data["giorni"]
         ]
 
     def to_dict(self):
-        return {**asdict(self), "date_time": self.date_time.to_dict()}
+        return {**asdict(self), "time_slot": self.time_slot.to_dict()}
 
 
 @dataclass
@@ -71,8 +71,5 @@ class SlotData:
 
 @dataclass
 class BookingData:
-    date: date
-    time: int
     slot_id: int
-    user_id: int
-    callback: str
+    data: BookingRequests
