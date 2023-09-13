@@ -1,5 +1,5 @@
 from libs import database
-from libs.utils import reconnection_decorator
+from libs.utils import reconnection_decorator, log_console
 
 
 @reconnection_decorator(max_retries=10, delay_seconds=5)
@@ -8,6 +8,7 @@ def create_all():
 
 
 if __name__ == "__main__":
+    log_console("CreateDB started...")
     create_all()
 
     with database.getSession() as session:
@@ -18,3 +19,5 @@ if __name__ == "__main__":
         session.add(database.Slot(id=2, name="Slot 2"))
         session.add(database.Slot(id=3, name="Slot 3"))
         session.add(database.Slot(id=4, name="Slot 4"))
+
+    log_console("CreateDB terminated!")

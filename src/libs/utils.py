@@ -12,14 +12,15 @@ def reconnection_decorator(max_retries=3, delay_seconds=1):
             retries = 0
             while retries < max_retries:
                 try:
+                    log_console("Connecting...")
                     return func(*args, **kwargs)
                 except KeyboardInterrupt:
                     return
                 except:
-                    print("Retrying connection...")
+                    log_console(f"Wait {delay_seconds} seconds to reconnect...")
                     time.sleep(delay_seconds)
                     retries += 1
-            print(f"Max retries ({max_retries}) reached. Exiting...")
+            log_console(f"Max retries ({max_retries}) reached. Exiting...")
 
         return wrapper
 
