@@ -14,6 +14,7 @@ services:
       args:
         - "UID=${UID}"
         - "GID=${GID}"
+        - "DB_CONNECTION_STRING=${DB_CONNECTION_STRING}"
     depends_on:
       - "mysql-db"
   rabbitmq:
@@ -32,6 +33,11 @@ services:
       args:
         - "UID=${UID}"
         - "GID=${GID}"
+        - "DB_CONNECTION_STRING=${DB_CONNECTION_STRING}"
+        - "SENDER_EMAIL=${SENDER_EMAIL}"
+        - "SENDER_PWD=${SENDER_PWD}"
+        - "SMTP_HOST=${SMTP_HOST}"
+        - "SMTP_PORT=${SMTP_PORT}"
     depends_on:
       - "rabbitmq"
       - "mysql-db"
@@ -46,6 +52,7 @@ services:
         - "GID=${GID}"
         - "MODE=DEV"
         - "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
+        - "DB_CONNECTION_STRING=${DB_CONNECTION_STRING}"
         - "FLASK_DEBUG=1"
     ports:
       - '5000:8000'
@@ -67,6 +74,7 @@ services:
         - "GID=${GID}"
         - "MODE=PROD"
         - "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
+        - "DB_CONNECTION_STRING=${DB_CONNECTION_STRING}"
         - "FLASK_DEBUG=0"
     ports:
       - '80:8000'

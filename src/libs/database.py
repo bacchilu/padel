@@ -1,7 +1,11 @@
+import os
 from contextlib import contextmanager
 
 from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+
+
+DB_CONNECTION_STRING = os.environ.get("DB_CONNECTION_STRING", "")
 
 
 Base = declarative_base()
@@ -39,7 +43,7 @@ Slot.bookings = relationship("Booking", order_by=Booking.date, back_populates="s
 User.bookings = relationship("Booking", order_by=Booking.date, back_populates="user")
 
 
-engine = create_engine("mysql+mysqlconnector://root:luca@mysql-db/padel")
+engine = create_engine(DB_CONNECTION_STRING)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

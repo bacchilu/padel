@@ -6,6 +6,7 @@ WORKDIR /app
 ARG UID
 ARG GID
 ARG MODE=PROD
+ARG DB_CONNECTION_STRING
 
 RUN groupadd -g "${GID}" python
 RUN useradd --create-home --no-log-init -u "${UID}" -g "${GID}" python
@@ -28,6 +29,7 @@ ARG FLASK_DEBUG=0
 
 ENV FLASK_APP=src/server.py
 ENV FLASK_DEBUG=${FLASK_DEBUG}
+ENV DB_CONNECTION_STRING="${DB_CONNECTION_STRING}"
 
 EXPOSE 8000
 

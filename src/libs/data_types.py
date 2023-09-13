@@ -22,6 +22,9 @@ class TimeSlot:
     def is_expired(self):
         return datetime.combine(self.date, time(self.time)) < datetime.now()
 
+    def isoformat(self):
+        return datetime.combine(self.date, time(self.time)).isoformat()
+
 
 @dataclass(kw_only=True)
 class Callback:

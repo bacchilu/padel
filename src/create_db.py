@@ -12,8 +12,10 @@ if __name__ == "__main__":
     create_all()
 
     with database.getSession() as session:
-        session.add(database.User(id=1, name="Luca", email="bacchilu@gmail.com"))
-        session.add(database.User(id=2, name="Viola", email="viola@example.com"))
+        session.add(database.User(id=1, name="Alice", email="alice@gmail.com"))
+        session.add(database.User(id=2, name="Bob", email="bob@gmail.com"))
+        session.add(database.User(id=3, name="Clarice", email="clarice@gmail.com"))
+        session.add(database.User(id=4, name="David", email="david@gmail.com"))
 
         session.add(database.Slot(id=1, name="Slot 1"))
         session.add(database.Slot(id=2, name="Slot 2"))
